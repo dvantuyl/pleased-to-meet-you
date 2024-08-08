@@ -1,0 +1,121 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    async (2.14.2)
+      console (~> 1.25, >= 1.25.2)
+      fiber-annotation
+      io-event (~> 1.6, >= 1.6.5)
+    async-container (0.18.2)
+      async (~> 2.10)
+    async-http (0.69.0)
+      async (>= 2.10.2)
+      async-pool (~> 0.7)
+      io-endpoint (~> 0.11)
+      io-stream (~> 0.4)
+      protocol-http (~> 0.26)
+      protocol-http1 (~> 0.19)
+      protocol-http2 (~> 0.18)
+      traces (>= 0.10)
+    async-http-cache (0.4.4)
+      async-http (~> 0.56)
+    async-ollama (0.1.0)
+      async
+      async-rest (~> 0.13.0)
+    async-pool (0.7.0)
+      async (>= 1.25)
+    async-rest (0.13.0)
+      async-http (~> 0.42)
+      protocol-http (~> 0.7)
+    async-service (0.12.0)
+      async
+      async-container (~> 0.16)
+    bigdecimal (3.1.8)
+    console (1.27.0)
+      fiber-annotation
+      fiber-local (~> 1.1)
+      json
+    ethon (0.16.0)
+      ffi (>= 1.15.0)
+    extralite-bundle (2.8.2)
+    falcon (0.47.7)
+      async
+      async-container (~> 0.18)
+      async-http (~> 0.66, >= 0.66.3)
+      async-http-cache (~> 0.4.0)
+      async-service (~> 0.10)
+      bundler
+      localhost (~> 1.1)
+      openssl (~> 3.0)
+      process-metrics (~> 0.2.0)
+      protocol-rack (~> 0.5)
+      samovar (~> 2.3)
+    faraday (2.10.1)
+      faraday-net_http (>= 2.0, < 3.2)
+      logger
+    faraday-net_http (3.1.1)
+      net-http
+    faraday-typhoeus (1.1.0)
+      faraday (~> 2.0)
+      typhoeus (~> 1.4)
+    ffi (1.17.0)
+    ffi (1.17.0-arm64-darwin)
+    fiber-annotation (0.2.0)
+    fiber-local (1.1.0)
+      fiber-storage
+    fiber-storage (0.1.2)
+    io-endpoint (0.13.0)
+    io-event (1.6.5)
+    io-stream (0.4.0)
+    json (2.7.2)
+    localhost (1.3.1)
+    logger (1.6.0)
+    mapping (1.1.1)
+    net-http (0.4.1)
+      uri
+    ollama-ai (1.3.0)
+      faraday (~> 2.10)
+      faraday-typhoeus (~> 1.1)
+      typhoeus (~> 1.4, >= 1.4.1)
+    openssl (3.2.0)
+    process-metrics (0.2.1)
+      console (~> 1.8)
+      samovar (~> 2.1)
+    protocol-hpack (1.5.0)
+    protocol-http (0.28.1)
+    protocol-http1 (0.19.1)
+      protocol-http (~> 0.22)
+    protocol-http2 (0.18.0)
+      protocol-hpack (~> 1.4)
+      protocol-http (~> 0.18)
+    protocol-rack (0.6.0)
+      protocol-http (~> 0.23)
+      rack (>= 1.0)
+    rack (3.1.7)
+    roda (3.82.0)
+      rack
+    samovar (2.3.0)
+      console (~> 1.0)
+      mapping (~> 1.0)
+    sequel (5.82.0)
+      bigdecimal
+    traces (0.11.1)
+    typhoeus (1.4.1)
+      ethon (>= 0.9.0)
+    uri (0.13.0)
+    zeitwerk (2.6.16)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  async-ollama (~> 0.1.0)
+  extralite-bundle (~> 2.8)
+  falcon (~> 0.47.7)
+  ollama-ai (~> 1.3)
+  roda (~> 3.82)
+  sequel (~> 5.82)
+  zeitwerk (~> 2.6)
+
+BUNDLED WITH
+   2.5.9
