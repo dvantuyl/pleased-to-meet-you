@@ -1,20 +1,26 @@
 class RoleplayAgent
+
+  def initialize(id)
+    @id = id
+  end
+
+  def respond
+    RoleplayAgent.respond(@id)
+  end
+
   class << self
 
-    def generate
-      ->(event, data) {
-        model = 'llama3.1'
-        prompt = data[:value]
-        case event
-        when 'user_input'
-          llm.generate({
-            model:,
-            prompt:,
-            stream: false
-          }).then(& parse_response)
+    def by(id)
+      RoleplayAgent.new(id)
+    end
 
+    def respond(id)
+      ->(event) {
+        case event.type
+        in UserInputEvent::TYPE
+          handle_user_input(event)
         else
-          App.logger << "Wrong event '#{event}'"
+          App.logger << "Wrong event '#{event.type}'"
         end
       }
     end
@@ -35,6 +41,15 @@ class RoleplayAgent
       ->(response) {
         response.first["response"]
       }
+    end
+
+    def handle_user_input(event)
+      #history = MemoryData.for_agent_id(id).map { |row| row[:memory] }
+      llm.generate({
+        model: 'llama3.1',
+        prompt: event.message,
+        stream: false
+      }).then(& parse_response)
     end
   end
 

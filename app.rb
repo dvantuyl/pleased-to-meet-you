@@ -5,6 +5,7 @@ loader.push_dir('components')
 loader.push_dir('layouts')
 loader.push_dir('agents')
 loader.push_dir('data')
+loader.push_dir('events')
 loader.setup
 
 class App < Roda
@@ -30,7 +31,7 @@ class App < Roda
     end
 
     r.post 'user-input' do
-      EventData.add('user_input', {value: r.params['message']})
+      UserInputEvent.create(r.params['message'])
       UserInputComponent.render
     end
 
@@ -46,8 +47,8 @@ class App < Roda
       response['Content-Type'] = 'text/event-stream'
       stream do |out|
         EventData.stream_latest(&
-          RoleplayAgent.generate >>
-          AgentComponent.stream(out, to: id))
+          RoleplayAgent.by(id).respond >>
+          AgentComponent.by(id).stream(out))
       end
     end
   end

@@ -1,6 +1,19 @@
 class AgentComponent
 
+  def initialize(id)
+    @id = id
+  end
+
+  def stream(out)
+    AgentComponent.stream(out, to: @id)
+  end
+
   class << self
+
+    def by(id)
+      self.new(id)
+    end
+
     def render(id)
       <<~HTML
       <article>
