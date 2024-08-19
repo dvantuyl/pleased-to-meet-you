@@ -1,35 +1,36 @@
+require 'extralite'
+
 class EventData
+
+  Record = Data.define(:type, :entity, :message, :timestamp)
   class << self
 
     def stream_latest(&block)
       last_timestamp = Time.now.to_i
       while true
         greater_than(last_timestamp).each do |row|
-          block.call(Event.from(row[:event], JSON.parse(row[:data], symbolize_names: true)))
+          block.call(Record.new(row[:type], row[:entity], row[:message], row[:timestamp]))
           last_timestamp = row[:timestamp]
         end
         sleep 0.25
       end
     end
 
-
-    def insert
-      ->(event) {
-        timestamp = Time.now.to_i
-        db[:events].insert(event: event.type, data: event.serialize, timestamp: timestamp)
-      }
+    def insert(event)
+      db.busy_timeout = 5
+      db.execute(
+        'insert into events (type, entity, message, timestamp) values (?, ?, ?, ?)',
+        event.type, event.entity, event.message, event.timestamp)
     end
 
     private
 
     def greater_than(last_timestamp)
-      db[:events]
-        .where { timestamp > last_timestamp }
+      db.query('SELECT * FROM events WHERE timestamp > ?', last_timestamp)
     end
 
     def db
-      Sequel.connect('extralite://db/development.db')
+      Extralite::Database.new('db/development.db', wal: true)
     end
-
   end
 end

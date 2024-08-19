@@ -4,8 +4,8 @@ loader = Zeitwerk::Loader.new
 loader.push_dir('components')
 loader.push_dir('layouts')
 loader.push_dir('agents')
-loader.push_dir('data')
 loader.push_dir('events')
+loader.push_dir('data')
 loader.setup
 
 class App < Roda
@@ -31,7 +31,8 @@ class App < Roda
     end
 
     r.post 'user-input' do
-      UserInputEvent.create(r.params['message'])
+      record = UserInputEvent.record(r.params['message'])
+      EventData.insert(record)
       UserInputComponent.render
     end
 
@@ -48,7 +49,8 @@ class App < Roda
       stream do |out|
         EventData.stream_latest(&
           RoleplayAgent.by(id).respond >>
-          AgentComponent.by(id).stream(out))
+          ConversationComponent.stream(out)
+        )
       end
     end
   end

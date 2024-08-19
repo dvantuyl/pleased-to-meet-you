@@ -1,26 +1,8 @@
-  class UserInputEvent < Event
-    attr_reader :message
+class UserInputEvent
 
-    TYPE = 'user_input'
-
-    def initialize(message)
-      @message = message
+  class << self
+    def record(message)
+      EventData::Record.new(name, 'user', message, Time.now.to_i)
     end
-
-    def serialize
-      { message: @message }.to_json
-    end
-
-    def type
-      TYPE
-    end
-
-
-    class << self
-
-      def create(message, insert_action = EventData.insert)
-        insert_action.call(new(message))
-      end
-    end
-
   end
+end

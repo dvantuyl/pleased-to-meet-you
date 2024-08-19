@@ -15,11 +15,13 @@ class ConversationComponent
 
     def stream(out)
       ->(event) {
-        out << <<~OUT
-          event: conversation
-          data: <p class="#{event.type}">#{event.message}</p>
-          \n\n
-        OUT
+        if event
+          out << <<~OUT
+            event: conversation
+            data: <p class="#{event.entity}">#{event.message}</p>
+            \n\n
+          OUT
+        end
       }
     end
   end
