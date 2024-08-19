@@ -16,10 +16,11 @@ class RoleplayAgent
 
     def respond(id)
       ->(event) {
-        message = if event.type == UserInputEvent.name && id == 1
-          handle_user_input(event)
-        elsif event.type == AgentOutputEvent.name && event.entity != "agent-#{id}"
-          handle_agent_output(event)
+        message = case event.type
+        when UserInputEvent.name
+          handle_user_input(event, id)
+        when AgentOutputEvent.name
+          handle_agent_output(event, id)
         else
           nil
         end
@@ -50,7 +51,9 @@ class RoleplayAgent
       }
     end
 
-    def handle_user_input(event)
+    def handle_user_input(event, id)
+      return nil if id != 1
+
       #history = MemoryData.for_agent_id(id).map { |row| row[:memory] }
       llm.generate({
         model: 'llama3.1',
@@ -59,7 +62,9 @@ class RoleplayAgent
       }).then(& parse_response)
     end
 
-    def handle_agent_output(event)
+    def handle_agent_output(event, id)
+      return nil if event.entity == "agent-#{id}"
+
       #history = MemoryData.for_agent_id(id).map { |row| row[:memory] }
       llm.generate({
         model: 'llama3.1',

@@ -19,7 +19,7 @@ class EventData
     def insert(event, retries: 3)
       db.busy_timeout = 5
       db.execute(
-        'insert into events (type, entity, message, timestamp) values (?, ?, ?, ?)',
+        'INSERT INTO events (type, entity, message, timestamp) VALUES (?, ?, ?, ?)',
         event.type, event.entity, event.message, event.timestamp)
     rescue SQLite3::BusyException
       insert(event, retries: retries - 1) if retries > 0
