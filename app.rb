@@ -48,8 +48,8 @@ class App < Roda
       response['Content-Type'] = 'text/event-stream'
       stream do |out|
         EventData.stream_latest(&
-          RoleplayAgent.by(id).respond >>
-          ConversationComponent.stream(out)
+          MemoryAgent.by(id).store >>
+          AgentComponent.by(id).stream(out)
         )
       end
     end

@@ -23,6 +23,8 @@ class EventData
         event.type, event.entity, event.message, event.timestamp)
     rescue SQLite3::BusyException
       insert(event, retries: retries - 1) if retries > 0
+    ensure
+      event
     end
 
     private

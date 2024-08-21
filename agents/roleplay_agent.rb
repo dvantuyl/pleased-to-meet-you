@@ -1,77 +1,66 @@
 class RoleplayAgent
+  attr_reader :id
 
   def initialize(id)
     @id = id
   end
 
-  def respond
-    RoleplayAgent.respond(@id)
+  def respond_to(event)
+      return nil if event.entity == 'user' && event.entity == 'agent-2' ||
+                    event.entity == "agent-#{id}"
+
+      agent = RoleplayAgent.new(id)
+      agent.respond_to_memory(event)
   end
 
-  class << self
 
-    def by(id)
-      RoleplayAgent.new(id)
-    end
+  def respond_to_memory(event)
 
-    def respond(id)
-      ->(event) {
-        message = case event.type
-        when UserInputEvent.name
-          handle_user_input(event, id)
-        when AgentOutputEvent.name
-          handle_agent_output(event, id)
-        else
-          nil
-        end
+    message = llm.generate({
+      model: 'llama3.1',
+      system: system,
+      prompt: prompt(event),
+      stream: false
+    }).then(& parse_response)
 
-        if message
-          record = AgentOutputEvent.record("agent-#{id}", message)
-          EventData.insert(record)
-          record
-        end
+    EventData.insert(AgentOutputEvent.record("agent-#{id}", message))
+  end
+
+  private
+
+  def llm
+    Ollama.new(
+      credentials: { address: 'http://localhost:11434' },
+      options: {
+        connection: { adapter: :net_http },
+        server_sent_events: false
       }
-    end
+    )
+  end
 
-    private
+  def parse_response
+    ->(response) {
+      response.first["response"]
+    }
+  end
 
-    def llm
-      Ollama.new(
-        credentials: { address: 'http://localhost:11434' },
-        options: {
-          connection: { adapter: :net_http },
-          server_sent_events: false
-        }
-      )
-    end
+  def system
+    <<~SYSTEM
+      You are roleplaying as agent-#{id}. You are responsible for responding to the memories of agent-#{id == 1 ? 2 : 1}.
 
-    def parse_response
-      ->(response) {
-        response.first["response"]
-      }
-    end
+      Each memory is a relationship with between you and other entities in chronological order from past to present:
 
-    def handle_user_input(event, id)
-      return nil if id != 1
+      #{memories}
 
-      #history = MemoryData.for_agent_id(id).map { |row| row[:memory] }
-      llm.generate({
-        model: 'llama3.1',
-        prompt: event.message,
-        stream: false
-      }).then(& parse_response)
-    end
+    SYSTEM
+  end
 
-    def handle_agent_output(event, id)
-      return nil if event.entity == "agent-#{id}"
+  def prompt(event)
+    event.message
+  end
 
-      #history = MemoryData.for_agent_id(id).map { |row| row[:memory] }
-      llm.generate({
-        model: 'llama3.1',
-        prompt: event.message,
-        stream: false
-      }).then(& parse_response)
-    end
+  def memories
+    MemoryData.for_agent_id(id).map { |row| "- #{row[:memory]}" }.join("\n")
   end
 
 end

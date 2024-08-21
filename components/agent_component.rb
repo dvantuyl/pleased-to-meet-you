@@ -20,7 +20,7 @@ class AgentComponent
         <header>
           <hgroup>
           <h3>Agent #{id}</h3>
-          <p>Opinion</p>
+          <p>Memory</p>
           </hgroup
         </header>
         <div hx-ext="sse"
@@ -33,13 +33,14 @@ class AgentComponent
     end
 
     def stream(out, to:)
-      ->(message) {
-
-        out << <<~OUT
-          event: agent_#{to}
-          data: <p>#{message}</p>
-          \n\n
-        OUT
+      ->(event) {
+        if event&.message
+          out << <<~OUT
+            event: agent_#{to}
+            data: <p>#{event.message}</p>
+            \n\n
+          OUT
+        end
       }
     end
   end
